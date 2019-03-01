@@ -1,0 +1,78 @@
+<html>
+
+<head>
+  <title>Testimonial Looper</title>
+  <meta charset="UTF-8">
+  <link href="https://fonts.googleapis.com/css?family=Laila|Oswald" rel="stylesheet">
+  <style>
+    h1 {
+      margin-top: 2em;
+      font-family: 'Oswald', sans-serif;
+    }
+
+    #testimonials .typed {
+      font-family: 'Laila', sans-serif;
+      color: orangered;
+    }
+
+    #testimonials .hint {
+      font-family: 'Laila', sans-serif;
+      color: #eee;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>Things customers have said...</h1>
+  <h2>
+    <span id="testimonials" data-pace="80" data-stall="1500" data-text='[
+            "Each team dressed different and made the pictures so fun to look at",
+            "Definitely learned the power of teamwork & communication all while having fun!",
+            "The challenges were fun, sometimes ridiculous but hilarious at the same time",
+            "The kids had so much fun running around and doing silly things"
+          ]'></span>
+  </h2>
+  <script>
+    const outputEl = document.getElementById('testimonials')
+    const quotes = JSON.parse(outputEl.dataset.text)
+    const pace = parseInt(outputEl.dataset.pace)
+    const stall = parseInt(outputEl.dataset.stall)
+
+    const wait = ms => new Promise(resolve => setTimeout(resolve, ms))
+
+    const asyncLoop = async (array, fn) => {
+      for (let i = 0; i < array.length; i < array.length - 1 ? i++ : i = 0) {
+        await fn(array[i], i, array);
+      }
+    }
+
+    const type = (text, el, pace = 80) => new Promise(async (resolve, reject) => {
+      for (var i = 0; i <= text.length; i++) {
+        el.innerHTML = `<span class="typed">${text.substr(0, i)}</span><span class="hint">${text.substr(i)}</span>`
+        await wait(pace)
+      }
+      return resolve(text)
+    })
+
+    const untype = (text, el, pace = 40) => new Promise(async (resolve, reject) => {
+      for (var i = text.length; i >= 0; i--) {
+        el.innerHTML = `<span class="typed">${text.substr(0, i)}</span>`
+        await wait(pace)
+      }
+      return resolve(text)
+    })
+
+    const reveal = (text, el, pace) => new Promise(async (resolve, reject) => {
+      await type(text, el, pace)
+      await wait(stall)
+      await untype(text, el, pace / 2)
+      return resolve(text, el)
+    })
+
+    asyncLoop(quotes, text => reveal(text, outputEl, pace))
+
+
+  </script>
+</body>
+
+</html>
